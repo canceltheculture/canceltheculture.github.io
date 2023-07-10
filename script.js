@@ -598,16 +598,6 @@ if (post.url && isImageURL(post.url)) {
 }
 
 
-if (post.url && !isRedditURL(post.url)) { 
-  const linkElement = document.createElement('a');
-  linkElement.href = post.url;
-  linkElement.target = '_blank';
-  linkElement.textContent = post.url;
-  linkElement.style.textDecoration = 'underline';
-  linkElement.style.color = 'white';
-  displayedInfoElement.appendChild(linkElement);
-}
-
 
   if (post.over_18) {
     const nsfwElement = document.createElement('p');
