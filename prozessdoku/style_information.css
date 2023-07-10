@@ -1,0 +1,619 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  background-color: #000000;
+  color: #FFFFFF;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+h1 {
+  font-weight: 700;
+  display: inline;
+}
+
+h2 {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+h3 {
+  font-weight: 600;
+  font-size: 25px;
+}
+
+h4 {
+  font-weight: 600;
+  font-size: 14px;
+  display: inline;
+}
+
+hr {
+  height: 1px;
+  background-color: #FFFFFF;
+  border: none;
+  margin: 5px 0;
+}
+
+.hr2 {
+  height: 2px;
+  background-color: #FFFFFF;
+  margin: 40px 0;
+}
+
+a {
+  color: #FFFFFF;
+}
+
+a:hover {
+  color: #CCCCCC;
+  text-decoration: underline;
+}
+
+.container {
+  display: flex;
+  position: relative;
+  margin-right: -2%;
+}
+
+.column-left {
+  width: 70%;
+  position: relative;
+  padding: 0 2%;
+}
+
+.title-row {
+  position: sticky;
+  top: 30vh;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  font-size: 12px;
+  border-bottom: 1px solid #DDDDDD;
+  background-color: #000000;
+}
+
+.title-row .column {
+  flex: 0 0 15%;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 5px;
+}
+
+.title-row .column:not(:last-child) {
+  margin-right: 5px;
+}
+
+.title-row .column:not(:first-child)::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+}
+
+.title-row .column:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  right: 0;
+  width: 1px;
+  background-color: #FFFFFF;
+}
+
+.row {
+  display: flex;
+  padding: 10px;
+  background-color: #000000;
+  border-bottom: 1px solid #FFFFFF;
+}
+
+.row:first-child .username,
+.row:first-child .subreddit,
+.row:first-child .post {
+  font-weight: bold;
+}
+
+.username,
+.subreddit {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 5px;
+}
+
+.post {
+  font-size: 16px;
+  flex-grow: 1;
+  margin-left: 10px;
+  white-space: normal;
+  overflow: hidden;
+  color: #FFFFFF;
+}
+
+.centered-div {
+  padding: 5%;
+  width: 98vw;
+  overflow: auto;
+  height: calc(100vh - 80px);
+  margin-top: 80px;
+  margin-bottom: 30px;
+  border: none;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.centered-div::-webkit-scrollbar {
+  width: 10px;
+}
+
+.centered-div::-webkit-scrollbar-track {
+  background-color: #000000;
+}
+
+.centered-div::-webkit-scrollbar-thumb {
+  background-color: #FFFFFF;
+}
+
+.bottom-div {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background-color: #000000;
+  color: #FFFFFF;
+  border-top: 3px solid #FFFFFF;
+  z-index: 999;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 10px;
+}
+
+.arrow-box {
+  width: 40px;
+  height: 100%;
+  background-color: #FFFFFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 0.5%;
+  cursor: pointer;
+}
+
+.arrow-box:first-child {
+  margin-left: 0;
+}
+
+.arrow {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+}
+
+.arrow-up {
+  border-bottom: 10px solid #000000;
+}
+
+.arrow-down {
+  border-top: 10px solid #000000;
+}
+
+.arrow-box:hover {
+  background-color: #000000;
+}
+
+.arrow-box:hover .arrow-up {
+  border-bottom-color: #FFFFFF;
+}
+
+.arrow-box:hover .arrow-down {
+  border-top-color: #FFFFFF;
+}
+
+.top-div {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background-color: #000000;
+  color: #FFFFFF;
+  border-bottom: 3px solid #FFFFFF;
+  display: flex;
+  align-items: center;
+  z-index: 999;
+}
+
+.title {
+  font-size: 4.5vw;
+  font-weight: 500;
+  padding-left: 5%;
+  text-transform: uppercase;
+}
+
+.square-box {
+  width: 40px;
+  height: 100%;
+  color: #000000;
+  background-color: #FFFFFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 0.5%;
+  cursor: pointer;
+}
+
+.square-box:hover {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+.horizontal-container {
+  display: flex;
+}
+
+.horizontal-box {
+  flex: 1;
+  margin: 5px;
+}
+
+.back-link {
+  margin-left: auto;
+  margin-right: 5%;
+  width: 20vw;
+  height: 4vw;
+  background-color: #FFFFFF;
+  color: black;
+  display: flex;
+  font-size: 4vw;
+  font-weight: 500;
+  justify-content: flex-start;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  border: 2px solid white;
+}
+
+.back-link span {
+  position: absolute;
+  white-space: nowrap;
+  animation: my-animation 15s linear infinite;
+  animation-fill-mode: forwards;
+}
+
+.back-link:hover {
+  background-color: #000000;
+  color: #FFFFFF;
+  border: 2px solid white;
+}
+
+#scroll-container {
+  border: 3px solid white;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+#scroll-text {
+  white-space: nowrap;
+  animation: my-animation infinite linear;
+  animation-duration: 10s;
+}
+
+@keyframes my-animation {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.iframe-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #FFFFFF;
+}
+
+.iframe-container iframe {
+  margin: 0 10px;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+  background-color: #FFFFFF;
+  page-break-after: always;
+  display: block;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.iframe-container iframe {
+  margin: 0 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #FFFFFF #000000;
+}
+
+.iframe-container iframe::-webkit-scrollbar {
+  width: 10px;
+}
+
+.iframe-container iframe::-webkit-scrollbar-track {
+  background-color: #000000;
+}
+
+.iframe-container iframe::-webkit-scrollbar-thumb {
+  background-color: #FFFFFF;
+}
+
+.iframe-container iframe::-webkit-scrollbar-thumb:hover {
+  background-color: #CCCCCC;
+}
+
+.iframe-container iframe::-webkit-scrollbar-thumb:active {
+  background-color: #999999;
+}
+
+.iframe-container iframe::-webkit-scrollbar-thumb:vertical {
+  min-height: 50px;
+}
+
+.iframe-container iframe::-webkit-scrollbar-thumb:horizontal {
+  min-width: 50px;
+}
+
+.video-container {
+  display: flex;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.video-container video {
+  flex: 1;
+  width: 48%;
+  margin-right: 4%;
+  border: 1px solid #FFFFFF;
+}
+
+.video-container video:last-child {
+  margin-right: 0;
+}
+
+.full-width-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.full-width-container video {
+  width: 100%;
+  height: auto;
+  border: 1px solid #FFFFFF;
+}
+
+.full-width-container-link {
+  width: 100%;
+  margin: 0 auto;
+  background: #FFFFFF;
+  color: #000000;
+  justify-content: center;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.full-width-container-link p {
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
+.full-width-container-link a {
+  justify-content: center;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.full-width-container-link a:hover {
+  color: #CCCCCC;
+}
+
+.div-container {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  margin: 0 auto;
+  color: #000000;
+  text-align: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.div-container a {
+  justify-content: center;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.div-container p {
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
+.div-container a:hover {
+  color: #CCCCCC;
+}
+
+.div-item {
+  flex: 1;
+  margin-right: 4%;
+  background-color: white;
+  padding-top: 5px;
+}
+
+.div-item:last-child {
+  margin-right: 0;
+}
+
+@media (max-width: 600px) {
+  .div-container {
+    flex-wrap: wrap;
+  }
+
+  .div-item {
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
+.video-container video,
+.full-width-container video,
+.iframe {
+  display: block;
+  object-fit: cover;
+  border-top: 2px solid #000000;
+  border: 1px solid #FFFFFF;
+  box-sizing: border-box;
+}
+
+.code-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f8f8;
+  width: 100%;
+  max-width: 98.3%;
+  max-height:100%;
+  color: #333333;
+  padding: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.1vw;
+  line-height: 1.5;
+  border-radius: 5px;
+  overflow: auto;
+  margin: 0 auto;
+}
+
+.code-container h1,
+.code-container p,
+.code-container span {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+
+
+.code-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.code-container::-webkit-scrollbar-track {
+  background-color: #FFFFFF;
+  border: 1px solid #FFFFFF;
+}
+
+.code-container::-webkit-scrollbar-thumb {
+  background-color: #000000;
+  border: 1px solid #FFFFFF;
+}
+
+iframe[src="media/redditAPI/index2.html"] {
+  height: 450px;
+}
+
+iframe[src="media/twitterscraper/scraper.html"] {
+  height: 450px;
+}
+
+.threetimes-video {
+  display: flex;
+}
+
+.threetimes-video video {
+  flex: 1;
+  max-width: 33%;
+  max-height: 100%;
+  object-fit: contain;
+  margin-right: 0.5%;
+}
+
+.threetimes-video video:last-child {
+  margin-right: 0;
+}
+
+.audio-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-audio {
+  width: 100%;
+  max-width: 300px;
+  background-color: #FFFFFF;
+  color: #FFFFFF;
+  border: none;
+}
+
+.custom-audio::-webkit-media-controls-panel {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+.custom-audio::-webkit-media-controls,
+.custom-audio::-webkit-media-controls-play-button,
+.custom-audio::-webkit-media-controls-timeline,
+.custom-audio::-webkit-media-controls-current-time-display,
+.custom-audio::-webkit-media-controls-time-remaining-display,
+.custom-audio::-webkit-media-controls-volume-slider,
+.custom-audio::-webkit-media-controls-volume-slider-container,
+.custom-audio::-webkit-media-controls-fullscreen-button {
+  display: none;
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.error-2-image {
+  margin-top: 19px;
+}
+
+
+.image-container img {
+  width: 33%; 
+  height: auto;
+}
+
+.separator {
+  height: 1px;
+  background-color: #000000;
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
