@@ -31,7 +31,7 @@
   width: 50%; 
   border: 1px solid white;
   margin-bottom: 30px;
-  font-size: 11px;
+  font-size: 12px;
   justify-content: center; 
   align-items: center; 
 }
@@ -109,16 +109,12 @@
 }
 
 
-.media-container {
-  grid-column: span 2;
-}
-
 .media-container img,
 .media-container video,
 .media-container iframe {
-  max-width: 100%;
-  max-height: 400px; 
+  max-height: 500px; 
 }
+
 
 .upvote-downvote-ratio {
   height: 20px;
@@ -147,19 +143,7 @@
   background-color: #fff;
   border: 1px solid #000;
   box-sizing: border-box;
-  animation: fillRatio var(--animation-duration, 5s) ease-in-out forwards; 
-}
-
-.ratio-bar-text-overlay {
-  color: black;
-  font-size: 10px;
-  font-weight: 500;
-  text-align: center;
-}
-
-.ratio-bar .ratio-bar-overlay {
-  height: 100%;
-  width: calc(var(--ratio) * 100%);
+  animation: fillRatio var(--animation-duration, 5s) ease-in-out forwards;
 }
 
 @keyframes fillRatio {
@@ -167,8 +151,15 @@
     width: 0;
   }
   100% {
-    width: 100%;
+    width: calc(var(--ratio) * 100%);
   }
+}
+
+.ratio-bar-text-overlay {
+  color: black;
+  font-size: 10px;
+  font-weight: 500;
+  text-align: center;
 }
 
 
@@ -570,7 +561,7 @@ box-shadow: inset 0 1px 0 white;
     top: 0px;
     right: 0px;
     width: 600px;
-    height: 80px;
+    height: 70px;
     z-index: 9998;
     display: flex;
     flex-direction: column;
@@ -1031,6 +1022,70 @@ font-size: 1.5vh;
   }
 }
 
+
+.post-comment-container {
+  position:fixed top;
+  display: flex;
+  align-items: center;
+  color: black;
+  background-color: white;
+  border: 1px solid white;
+  font-size: 11px;
+  margin-bottom: 30px;
+}
+
+.comment-info {
+  flex: 1; /* Distribute available space equally */
+  text-align: center;
+  border: 1px solid black;
+}
+
+.posted-content {
+  width:96%;
+  margin-top:30px;
+    padding-left:10px;
+  padding-right:10px;
+  overflow:auto;
+}
+
+
+.media-container {
+}
+
+.media-item {
+}
+
+.video-item {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.container-div {
+  position:fixed;
+    overflow:auto;
+  width: 59vw;
+    height: 58vh;
+  border:1px solid white;
+  word-wrap: break-word;
+}
+
+.container-div::-webkit-scrollbar {
+  width: 5px; 
+}
+
+..container-div::-webkit-scrollbar-track {
+  background: #000; 
+}
+
+.container-div::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+.container-div::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
 .fixed-div {
   position: fixed;
   background-color: white;
@@ -1038,58 +1093,28 @@ font-size: 1.5vh;
   color:black;
   padding:5px;
   font-family: Space Grotesk;
-  font-size: 11px;
+  font-size: 10px;
   font-weight:500;
 }
 
-.post-comment-container {
-  position:fixed;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: black;
-  background-color: white;
-  border: 1px solid white;
-  font-size:11px;
-  margin-bottom: 10px;
-  white-space: nowrap;
-  margin-bottom:30px;
+.posted-date {
+  position: absolute;
+  bottom: 30%;
+  background-color: #fff;
+  padding-left: 8px;
+    padding-right: 8px;
+  font-size: 12px;
+  color:black;
+  border:1px solid white;
 }
 
-.comment-info {
-  padding-left:10px;
-  padding-right:10px;
-  flex: 1;
-  text-align: center;
-  border:1px solid black;
+.sidebar {
+  width: 300px;
+  color:black;
+    border:2px solid white;
+
 }
 
-.posted-content {
-  position:fixed;
-  background-color: black;
-  border: 1px solid white;
-  padding: 10px;
-  width:60%;
-  height:60%;
-  top:13vh;
-  overflow:auto;
-}
-
-.posted-content::-webkit-scrollbar {
-  width: 5px; 
-}
-
-..posted-content::-webkit-scrollbar-track {
-  background: #000; 
-}
-
-.posted-content::-webkit-scrollbar-thumb {
-  background: #888; 
-}
-
-.posted-content::-webkit-scrollbar-thumb:hover {
-  background: #555; 
-}
 
   </style>
 
@@ -1099,6 +1124,8 @@ font-size: 1.5vh;
 </head>
 
 <body>
+  <div id="website-container">
+
 
        <div id="overlay-loading">
     <div id="loading-animation"></div>
@@ -1181,22 +1208,22 @@ font-size: 1.5vh;
 
   <div class="sliding-div" id="sliding-div1">
     <div class="sliding-div-content">
-      <div class="fixed-div" style="left: 5.5vw; top: 0">← REFRESH THE PAGE</div>
-      <div class="fixed-div" style="left: 5.5vw; top:6.5vh">← CURRENT TIME</div>
-      <div class="fixed-div" style="left: 5.5vw; top:11.5vh">← TOGGLE THE INFORMATION</div>
-      <div class="fixed-div" style="left: 5.5vw; top:17.5vh">← READ INTO THE PROCESS</div>
-      <div class="fixed-div" style="left: 5.5vw; top:78vh">← TOGGLE THE 'NOT SAFE FOR WORK' SEARCH</div>
-      <div class="fixed-div" style="left: 5.5vw; top:81.3vh">← TOGGLE TO SCRAPE TRENDING POSTS</div>
-           <div class="fixed-div" style="left: 5.5vw; top:84.7vh">← PAUSE / PLAY</div>
-           <div class="fixed-div" style="left: 5.5vw; top:91.7vh">↙ ARCHIVE YOUR VIEWED POSTS</div>
-           <div class="fixed-div" style="left: 26vw; top:91.7vh">↓ TIME OF DISPLAY | NAME OF POST AUTHOR | POST TITLE | LINK TO THE REDDIT POST</div>
-           <div class="fixed-div" style="left: 26vw; top:73vh">↓ INFORMATIONS ABOUT THE POST POPULARITY</div>
-           <div class="fixed-div" style="left: 20vw; top:25vh">← RAW DATA</div>
-           <div class="fixed-div" style="left: 70vw; top:20vh; text-align:right">CURRENTLY TRENDING 'CANCEL' HASHTAGS →</div>
-           <div class="fixed-div" style="left: 50vw; top:9vh">← INFORMATIONS ABOUT THE POST POPULARITY</div>
-            <div class="fixed-div" style="left: 50vw; top:3vh">← INFORMATIONS ABOUT THE AUTHOR</div>
-           <div class="fixed-div" style="left: 84vw; top:91.7vh; text-align:right">OPEN YOUR HISTORY ↘</div>
-           <div class="fixed-div" style="left: 75vw; top:3vh; text-align:right">SEARCHBAR →</div>
+      <div class="fixed-div" style="left: 5.2vw; top: 0"><b>←</b> REFRESH THE PAGE</div>
+      <div class="fixed-div" style="left: 5.2vw; top:6.5vh"><b>←</b> CURRENT TIME</div>
+      <div class="fixed-div" style="left: 5.2vw; top:11.5vh"><b>←</b> TOGGLE THE INFORMATION</div>
+      <div class="fixed-div" style="left: 5.2vw; top:17.5vh"><b>←</b> READ INTO THE PROCESS</div>
+      <div class="fixed-div" style="left: 5.2vw; top:78vh"><b>←</b> TOGGLE THE 'NOT SAFE FOR WORK' SEARCH</div>
+      <div class="fixed-div" style="left: 5.2vw; top:81.3vh"><b>←</b> TOGGLE TO SCRAPE TRENDING POSTS</div>
+           <div class="fixed-div" style="left: 5.2vw; top:84.7vh"><b>↓</b> PAUSE / PLAY</div>
+           <div class="fixed-div" style="left: 5.2vw; top:91.7vh"><b>↙</b> ARCHIVE YOUR VIEWED POSTS</div>
+           <div class="fixed-div" style="left: 26vw; top:91.7vh"><b>↓</b> TIME OF DISPLAY&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;NAME OF POST AUTHOR&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;POST TITLE&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;LINK TO THE REDDIT POST</div>
+           <div class="fixed-div" style="left: 21.4vw; top:73vh"><b>↓</b> INFORMATIONS ABOUT THE POST POPULARITY</div>
+           <div class="fixed-div" style="left: 19.5vw; top:0vh"><b>←</b> RAW DATA</div>
+           <div class="fixed-div" style="right: 6vw; top:52vh; text-align:right">CURRENTLY TRENDING 'CANCEL' HASHTAGS <b>↗</b></div>
+           <div class="fixed-div" style="left: 21.4vw; top:11.5vh"><b>↑</b> INFORMATIONS ABOUT THE POST POPULARITY</div>
+            <div class="fixed-div" style="left: 50vw; top:0vh"><b>←</b> INFORMATIONS ABOUT THE AUTHOR</div>
+           <div class="fixed-div" style="right: 6vw; top:91.7vh; text-align:right">OPEN HISTORY <b>↘</b></div>
+           <div class="fixed-div" style="right: 6vw; top:0vh; text-align:right">SEARCHBAR <b>↓</b></div>
 
     </div>
   </div>
@@ -1216,6 +1243,8 @@ font-size: 1.5vh;
   </div>
 
 <div id="blackroom"><div id="expand-button">&#9650;</div></div>
+
+</div>
 
   <script src="script.js"></script>
  <script>

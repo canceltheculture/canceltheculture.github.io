@@ -69,6 +69,8 @@ async function fetchTrendingPosts() {
   names = names.map(name => {
     if (!name.startsWith('Dr.')) {
       return name.replace(/[^a-zA-Z\s].*$/, '');
+    name = name.replace(/\bsay\b|\bdefies\b|\bargue\b/gi, ''); // Remove specific words like 'says', 'defies', and 'argue'
+
     }
     return name;
   });
@@ -412,6 +414,20 @@ function calculateAccountAge(createdUtc) {
   return `${accountAgeYears} years`;
 }
 
+function isRedditGalleryURL(url) {
+  return url.includes('redditgallery.com');
+}
+
+function isImageURL(url) {
+  // Check if the URL ends with a common image file extension
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+  const lowercasedURL = url.toLowerCase();
+  return imageExtensions.some(extension => lowercasedURL.endsWith(extension));
+}
+
+function isRedditVideoURL(url) {
+    return url.includes('v.redd.it') || url.includes('v.redd.it/video/');
+}
 
 async function displayPostInformation(post) {
   const displayedInfoElement = document.getElementById('displayed_information');
@@ -453,14 +469,25 @@ async function displayPostInformation(post) {
   } else {
     const authorInfoErrorElement = document.createElement('p');
     authorInfoErrorElement.classList.add('author-info-error');
-    authorInfoErrorElement.textContent = 'Failed to fetch author information.';
+authorInfoErrorElement.innerHTML = 'Reddit-User<br style="font-size: 12px;">[deleted].<br>';
+authorInfoErrorElement.style.fontSize = '12px';
     displayedInfoElement.appendChild(authorInfoErrorElement);
   }
 
- 
+
+ const containerDiv = document.createElement('div');
+containerDiv.classList.add('container-div');
+
+
+
 
 const postCommentContainer = document.createElement('div');
 postCommentContainer.classList.add('post-comment-container');
+
+const subredditDiv = document.createElement('div');
+subredditDiv.textContent = `r/${post.subreddit}`;
+subredditDiv.classList.add('comment-info');
+postCommentContainer.appendChild(subredditDiv);
 
 const scoreDiv = document.createElement('div');
 scoreDiv.textContent = `Score: ${post.score}`;
@@ -468,24 +495,74 @@ scoreDiv.classList.add('comment-info');
 postCommentContainer.appendChild(scoreDiv);
 
 const commentCountDiv = document.createElement('div');
-commentCountDiv.textContent = `Number of Comments: ${post.num_comments}`;
+commentCountDiv.textContent = `total comments: ${post.num_comments}`;
 commentCountDiv.classList.add('comment-info');
 postCommentContainer.appendChild(commentCountDiv);
 
 const deletedCommentsDiv = document.createElement('div');
-deletedCommentsDiv.textContent = `Deleted Comments: ${post.num_deleted_comments || 0}`;
+deletedCommentsDiv.textContent = `deleted comments: ${post.num_deleted_comments || 0}`;
 deletedCommentsDiv.classList.add('comment-info');
 postCommentContainer.appendChild(deletedCommentsDiv);
 
 const bannedCommentsDiv = document.createElement('div');
-bannedCommentsDiv.textContent = `Banned Comments: ${post.num_banned_comments || 0}`;
+bannedCommentsDiv.textContent = `banned comments: ${post.num_banned_comments || 0}`;
 bannedCommentsDiv.classList.add('comment-info');
 postCommentContainer.appendChild(bannedCommentsDiv);
 
-displayedInfoElement.appendChild(postCommentContainer);
+if (post.over_18) {
+  const nsfwElement = document.createElement('div');
+  nsfwElement.textContent = 'NSFW';
+  nsfwElement.classList.add('comment-info');
+  postCommentContainer.appendChild(nsfwElement);
+}
+
+containerDiv.appendChild(postCommentContainer);
+displayedInfoElement.appendChild(containerDiv);
 
 const mediaContainer = document.createElement('div');
 mediaContainer.classList.add('media-container');
+
+if (post.url_overridden_by_dest) {
+  if (isImageURL(post.url_overridden_by_dest)) {
+    const imageElement = document.createElement('img');
+    imageElement.src = post.url_overridden_by_dest;
+    imageElement.alt = 'Post Image';
+    imageElement.classList.add('media-item');
+    mediaContainer.appendChild(imageElement);
+  } else if (isRedditVideoURL(post.url_overridden_by_dest)) {
+    const videoURL = post.media.reddit_video.fallback_url;
+    const videoElement = document.createElement('video');
+    videoElement.classList.add('media-item', 'video-item');
+    videoElement.src = videoURL;
+    videoElement.autoplay = true;
+    videoElement.controls = true;
+    videoElement.muted = false; // Change muted to false to play the video with sound
+    mediaContainer.appendChild(videoElement);
+  } else if (post.is_gallery && post.gallery_data && post.gallery_data.items.length > 0) {
+    const galleryImage = post.gallery_data.items[0];
+    const galleryImageURL = galleryImage.media_id
+      ? `https://i.redd.it/${galleryImage.media_id}.jpg`
+      : galleryImage.url;
+    const imageElement = document.createElement('img');
+    imageElement.src = galleryImageURL;
+    imageElement.alt = 'Gallery Image';
+    imageElement.classList.add('media-item');
+    mediaContainer.appendChild(imageElement);
+  }
+if (post.url_overridden_by_dest && !post.url_overridden_by_dest.includes('redd.it') && !post.url_overridden_by_dest.includes('reddit.com')) {
+  const postLink = document.createElement('a');
+  postLink.href = post.url_overridden_by_dest;
+  postLink.textContent = post.url_overridden_by_dest;
+  postLink.style.color='white';
+  postLink.style.fontSize = '13px'; // Example styling: set font size to 16px
+  postLink.style.fontWeight = 'bold'; // Example styling: set font weight to bold
+  postLink.target = '_blank'; // Open link in a new tab
+  mediaContainer.appendChild(postLink);
+}
+
+
+}
+
 
 const postContentElement = document.createElement('div');
 postContentElement.classList.add('post-content');
@@ -496,14 +573,31 @@ postedContent.classList.add('posted-content');
 postedContent.appendChild(mediaContainer);
 postedContent.appendChild(postContentElement);
 
-displayedInfoElement.appendChild(postedContent);
+containerDiv.appendChild(postedContent);
+displayedInfoElement.appendChild(containerDiv);
 
-  const upvoteDownvoteRatioElement = document.createElement('div');
+
+
+  const postedDateElement = document.createElement('div');
+  postedDateElement.classList.add('posted-date');
+
+  const postedDate = new Date(post.created_utc * 1000);
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const formattedDate = postedDate.toLocaleDateString(undefined, options);
+  postedDateElement.textContent = `Posted on ${formattedDate}`;
+
+  const sidebarElement = document.createElement('div');
+  sidebarElement.classList.add('sidebar');
+  sidebarElement.appendChild(postedDateElement);
+  displayedInfoElement.appendChild(sidebarElement);
+
+const upvoteDownvoteRatioElement = document.createElement('div');
   upvoteDownvoteRatioElement.classList.add('upvote-downvote-ratio');
 
-  const ratioBarElement = document.createElement('div');
-  ratioBarElement.classList.add('ratio-bar');
-  ratioBarElement.style.setProperty('--ratio', post.upvote_ratio);
+const ratioBarElement = document.createElement('div');
+ratioBarElement.classList.add('ratio-bar');
+ratioBarElement.style.setProperty('--ratio', post.upvote_ratio);
+
 
   const ratioBarOverlayElement = document.createElement('div');
   ratioBarOverlayElement.classList.add('ratio-bar-overlay');
@@ -525,96 +619,43 @@ displayedInfoElement.appendChild(postedContent);
   displayedInfoElement.appendChild(upvoteDownvoteRatioElement);
 
 
-  const comments = await fetchPostComments(post.id);
-  if (comments.length > 0) {
-    const sortedComments = comments.sort((a, b) => a.score - b.score);
-    const highestRatedComment = sortedComments[sortedComments.length - 1];
-    const lowestRatedComment = sortedComments[0];
-    const medianComment = sortedComments[Math.floor(sortedComments.length / 2)];
+const comments = await fetchPostComments(post.id);
 
-    const commentsContainer = document.createElement('div');
-    commentsContainer.classList.add('comments-container');
+const commentsContainer = document.createElement('div');
+commentsContainer.classList.add('comments-container');
 
-    const lowestRatedCommentDiv = createCommentDiv(lowestRatedComment, '↓');
-    commentsContainer.appendChild(lowestRatedCommentDiv);
+if (comments.length > 0) {
+  const sortedComments = comments.sort((a, b) => a.score - b.score);
+  const highestRatedComment = sortedComments[sortedComments.length - 1];
+  const lowestRatedComment = sortedComments[0];
+  const medianComment = sortedComments[Math.floor(sortedComments.length / 2)];
 
-    const medianRatedCommentDiv = createCommentDiv(medianComment, '↔');
-    commentsContainer.appendChild(medianRatedCommentDiv);
+  const lowestRatedCommentDiv = createCommentDiv(lowestRatedComment, '↓');
+  commentsContainer.appendChild(lowestRatedCommentDiv);
 
-    const highestRatedCommentDiv = createCommentDiv(highestRatedComment, '↑');
-    commentsContainer.appendChild(highestRatedCommentDiv);
+  const medianRatedCommentDiv = createCommentDiv(medianComment, '↔');
+  commentsContainer.appendChild(medianRatedCommentDiv);
 
-           displayedInfoElement.appendChild(commentsContainer); // Append comments container
-  }
+  const highestRatedCommentDiv = createCommentDiv(highestRatedComment, '↑');
+  commentsContainer.appendChild(highestRatedCommentDiv);
+} else {
+  const noCommentsDiv = document.createElement('div');
+  noCommentsDiv.textContent = '[no comments]';
 
+  const lowestRatedCommentDiv = createCommentDiv(noCommentsDiv, '↓');
+  commentsContainer.appendChild(lowestRatedCommentDiv);
 
-if (post.url && isImageURL(post.url)) {
-  const imageElement = document.createElement('img');
-  imageElement.style.maxWidth = '100%';
-  imageElement.style.height = 'auto'; // Set height to auto to maintain aspect ratio
-  imageElement.src = post.url;
-  mediaContainer.appendChild(imageElement);
-} else if (post.media && post.media.reddit_video) {
-  const videoElement = document.createElement('video');
-  videoElement.style.maxWidth = '100%';
-  videoElement.style.height = 'auto';
-  videoElement.controls = true;
-      redditVideoElement.autoplay = true; 
-    redditVideoElement.muted = false; 
+  const medianRatedCommentDiv = createCommentDiv(noCommentsDiv, '↔');
+  commentsContainer.appendChild(medianRatedCommentDiv);
 
-  videoElement.src = post.media.reddit_video.fallback_url;
-  mediaContainer.appendChild(videoElement);
-} else if (post.media && post.media.oembed) {
-  const providerName = post.media.oembed.provider_name;
-
-  if (providerName === 'YouTube') {
-  const youtubeElement = document.createElement('iframe');
-  youtubeElement.width = '100%';
-  youtubeElement.height = '315'; 
-  youtubeElement.src = post.media.oembed.url.replace('watch?v=', 'embed/');
-  youtubeElement.allowFullscreen = true;
-      redditVideoElement.autoplay = true; 
-    redditVideoElement.muted = false; 
-
-  youtubeElement.setAttribute('frameborder', '0');
-  youtubeElement.setAttribute('allow', 'autoplay; encrypted-media');
-  youtubeElement.setAttribute('allowfullscreen', ''); 
-  mediaContainer.appendChild(youtubeElement);
-}
- else if (providerName === 'Reddit' && post.media.oembed.type === 'video') {
-    const redditVideoElement = document.createElement('video');
-    redditVideoElement.style.maxWidth = '100%';
-    redditVideoElement.style.height = 'auto'; 
-    redditVideoElement.controls = true;
-    redditVideoElement.src = post.media.oembed.url;
-    mediaContainer.appendChild(redditVideoElement);
-  } else if (providerName === 'Reddit' && post.media.oembed.type === 'rich') {
-    const redditGalleryContainer = document.createElement('div');
-    redditGalleryContainer.classList.add('reddit-gallery-container');
-    const redditGalleryData = post.media.oembed.html;
-    redditGalleryContainer.innerHTML = redditGalleryData;
-    mediaContainer.appendChild(redditGalleryContainer);
-  }
+  const highestRatedCommentDiv = createCommentDiv(noCommentsDiv, '↑');
+  commentsContainer.appendChild(highestRatedCommentDiv);
 }
 
-
-if (post.url && !isRedditURL(post.url)) { 
-  const linkElement = document.createElement('a');
-  linkElement.href = post.url;
-  linkElement.target = '_blank';
-  linkElement.textContent = post.url;
-  linkElement.style.textDecoration = 'underline';
-  linkElement.style.color = 'white';
-  displayedInfoElement.appendChild(linkElement);
-}
+displayedInfoElement.appendChild(commentsContainer); // Append comments container
 
 
-  if (post.over_18) {
-    const nsfwElement = document.createElement('p');
-    nsfwElement.textContent = 'NSFW';
-    nsfwElement.classList.add('nsfw');
-    displayedInfoElement.appendChild(nsfwElement);
-  }
+
 }
 
 
@@ -647,17 +688,6 @@ function createCommentDiv(comment, symbol) {
 
   return commentDiv;
 }
-
-
-
-
-
-function isImageURL(url) {
-  const imageExtensions = /\.(gif|jpe?g|png|webp|bmp)$/i;
-  return imageExtensions.test(url);
-}
-
-
 
 async function fetchPostComments(postId) {
   try {
