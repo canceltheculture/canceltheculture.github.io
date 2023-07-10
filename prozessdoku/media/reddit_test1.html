@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reddit Posts - #cancelculture</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: monospace;
+      text-transform: uppercase;
+    }
+
+    .post-container {
+      text-align: center;
+      padding-left: 200px;
+      padding-right: 200px;
+    }
+
+    .post-container h3 {
+      font-size: 24px;
+    }
+
+    .post-container .username {
+      font-size: 15px;
+    }
+
+    .post-container .subreddit,
+    .post-container .upvotes,
+    .post-container .downvotes {
+      font-size: 15px;
+      margin-top: 5px;
+    }
+
+    .post-container .subreddit,
+    .post-container .downvotes {
+      margin-left: 10px;
+    }
+
+    .slider-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #f0f0f0;
+      padding: 10px;
+    }
+
+    .slider-container label {
+      font-size: 14px;
+    }
+
+    .post-container .votes .bold {
+      font-weight: bold;
+    }
+
+    .post-container .votes {
+      font-weight: bold;
+    }
+
+    .post-container .votes span {
+      margin-right: 10px;
+    }
+
+    .hashtag-container {
+      position: fixed;
+      cursor: pointer;
+      left: 10px;
+      top: 10px 0;
+    }
+
+    .archive-container {
+      position: fixed;
+      cursor: pointer;
+      right: 10px;
+      top: 10px 0;
+    }
+
+    .hashtag-container.selected {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+  </style>
+  <script src="https://www.reddit.com/prefs.js"></script>
+</head>
+<body>
+  <div id="hashtag-container">
+    <div id="cancelculture" class="hashtag-container selected">#cancelculture</div><br>
+     <div style="margin-left: 10px" id="epstein" class="hashtag-container">#epstein</div><br>
+     <div style="margin-left: 10px" id="budlight" class="hashtag-container">#budlight</div><br>
+    <div id="cancel" class="hashtag-container">#cancel</div><br>
+    <div id="censorship" class="hashtag-container">#censorship</div><br>
+    <div id="freedomofspeech" class="hashtag-container">#freedomofspeech</div><br>
+    <div id="bullshit" class="hashtag-container">#bullshit</div><br>
+  </div>
+
+  <div id="archive-container">
+    <div class="archive-container">Archive</div><br>
+  </div>
+
+  <div id="post" class="post-container"></div>
+
+  <div class="slider-container">
+    <input type="range" min="0.5" max="10" step="0.5" value="3" id="refresh-interval-slider">
+    <label for="refresh-interval-slider">Refresh: <span id="interval-value">3</span>s</label>
+    <button id="pauseButton">Pause</button>
+  </div>
+
+  <script>
+    function fetchRandomRedditPost(hashtag) {
+      const subreddit = 'all';
+      const limit = 20000;
+
+      const url = `https://www.reddit.com/r/${subreddit}/search.json?q=%23${hashtag}&limit=${limit}`;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const posts = data.data.children;
+          if (!posts || posts.length === 0) return;
+
+          const shownPostIds = JSON.parse(localStorage.getItem('shownPostIds')) || [];
+          const unseenPosts = posts.filter(post => !shownPostIds.includes(post.data.id));
+
+          if (unseenPosts.length === 0) {
+            localStorage.removeItem('shownPostIds');
+          } else {
+            const randomIndex = Math.floor(Math.random() * unseenPosts.length);
+            const randomPost = unseenPosts[randomIndex];
+            shownPostIds.push(randomPost.data.id);
+            localStorage.setItem('shownPostIds', JSON.stringify(shownPostIds));
+
+            const postContainer = document.getElementById('post');
+
+            if (randomPost.data.secure_media_embed.content) {
+              const embedCode = randomPost.data.secure_media_embed.content;
+              postContainer.innerHTML = embedCode;
+            } else {
+              const title = randomPost.data.title;
+              const permalink = `https://www.reddit.com${randomPost.data.permalink}`;
+              const username = randomPost.data.author;
+              const subredditName = randomPost.data.subreddit;
+              const upvotes = randomPost.data.ups;
+              const downvotes = randomPost.data.downs;
+              
+
+              const largerVotes = Math.max(upvotes, downvotes);
+              const upvotesClass = upvotes === largerVotes ? 'bold' : '';
+              const downvotesClass = downvotes === largerVotes ? 'bold' : '';
+
+              postContainer.innerHTML = `
+                <h3>${title}</h3>
+                <p>u/<span class="username">${username}</span> &#124; <span class="subreddit">r/${subredditName}</span></p>
+                <p class="votes">
+                  Upvotes: <span class="${upvotesClass}">${upvotes}</span> |
+                  Downvotes: <span class="${downvotesClass}">${downvotes}</span>
+                </p>
+                <p><a href="${permalink}" target="_blank">Reddit</a></p>
+              `;
+              
+              const postArchive = JSON.parse(localStorage.getItem('postArchive')) || [];
+              postArchive.push(randomPost.data);
+              localStorage.setItem('postArchive', JSON.stringify(postArchive));
+            }
+          }
+        })
+        .catch(error => console.error('Error fetching Reddit posts:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchRandomRedditPost('cancelculture');
+    });
+
+    let refreshInterval;
+    let currentHashtag = 'cancelculture';
+
+    function setRefreshInterval(interval) {
+      clearInterval(refreshInterval);
+      refreshInterval = setInterval(() => {
+        fetchRandomRedditPost(currentHashtag);
+      }, interval * 1000);
+    }
+
+    const intervalSlider = document.getElementById('refresh-interval-slider');
+    const intervalValue = document.getElementById('interval-value');
+    const pauseButton = document.getElementById('pauseButton');
+    const hashtagContainer = document.getElementById('hashtag-container');
+
+    intervalSlider.addEventListener('input', function() {
+      const interval = intervalSlider.value;
+      intervalValue.textContent = interval;
+      setRefreshInterval(interval);
+    });
+
+    pauseButton.addEventListener('click', function() {
+      const isPaused = pauseButton.textContent === 'Pause';
+
+      if (isPaused) {
+        clearInterval(refreshInterval);
+        pauseButton.textContent = 'Resume';
+      } else {
+        setRefreshInterval(intervalSlider.value);
+        pauseButton.textContent = 'Pause';
+      }
+    });
+
+    hashtagContainer.addEventListener('click', function(event) {
+      const target = event.target;
+      if (target.classList.contains('hashtag-container')) {
+        hashtagContainer.querySelectorAll('.hashtag-container').forEach(item => {
+          item.classList.remove('selected');
+        });
+        target.classList.add('selected');
+
+        const hashtag = target.id;
+        currentHashtag = hashtag;
+        clearInterval(refreshInterval);
+        setRefreshInterval(intervalSlider.value);
+        fetchRandomRedditPost(hashtag);
+      }
+    });
+
+    const archiveContainer = document.querySelector('.archive-container');
+    archiveContainer.addEventListener('click', function() {
+      const postArchive = JSON.parse(localStorage.getItem('postArchive')) || [];
+      const filename = 'reddit_archive.json';
+      const fileContent = JSON.stringify(postArchive, null, 2);
+
+      const element = document.createElement('a');
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileContent));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    });
+  </script>
+</body>
+</html>
