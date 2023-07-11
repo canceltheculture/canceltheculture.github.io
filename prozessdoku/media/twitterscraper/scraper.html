@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CSV File Display</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .top-div {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #ffffff;
+      display: flex;
+      border-bottom: 1px solid #dddddd;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .top-row {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .top-row.selected {
+      background-color: #dddddd;
+      color: #ffffff;
+    }
+
+    .table-container {
+      margin-top: 80px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      padding: 10px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f9f9f9;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const files = ['budlight.csv', 'cancel_april.csv', 'cancelculture_april.csv', 'cancelculture_june.csv'];
+      let activeFileIndex = getRandomIndex(files.length); // Get a random index
+      let table;
+
+      function getRandomIndex(max) {
+        return Math.floor(Math.random() * max);
+      }
+
+      function loadCSVFile(fileIndex) {
+        if (table) {
+          table.remove();
+        }
+
+        Papa.parse(files[fileIndex], {
+          download: true,
+          header: true,
+          complete: function(results) {
+            const rows = results.data;
+            table = document.createElement('table');
+
+            const headers = Object.keys(rows[0]);
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+              const headerCell = document.createElement('th');
+              headerCell.textContent = header;
+              headerRow.appendChild(headerCell);
+            });
+            table.appendChild(headerRow);
+
+            // Create table rows
+            rows.forEach(rowData => {
+              const row = document.createElement('tr');
+              headers.forEach(header => {
+                const cell = document.createElement('td');
+                cell.textContent = rowData[header];
+                row.appendChild(cell);
+              });
+              table.appendChild(row);
+            });
+
+            document.querySelector('.table-container').appendChild(table);
+          }
+        });
+      }
+
+      function handleRowClick(index) {
+        if (activeFileIndex === index) {
+          return;
+        }
+
+        activeFileIndex = index;
+        loadCSVFile(activeFileIndex);
+
+        const topRows = document.querySelectorAll('.top-row');
+        topRows.forEach((row, i) => {
+          if (i === activeFileIndex) {
+            row.classList.add('selected');
+          } else {
+            row.classList.remove('selected');
+          }
+        });
+      }
+
+      const topRows = document.querySelectorAll('.top-row');
+      topRows.forEach((row, index) => {
+        row.addEventListener('click', () => handleRowClick(index));
+      });
+
+      loadCSVFile(activeFileIndex);
+      topRows[activeFileIndex].classList.add('selected');
+    });
+  </script>
+</head>
+<body>
+  <div class="top-div">
+    <div class="top-row">budlight.csv</div>
+    <div class="top-row">cancel_april.csv</div>
+    <div class="top-row">cancelculture_april.csv</div>
+    <div class="top-row">cancelculture_june.csv</div>
+  </div>
+
+  <div class="table-container"></div>
+</body>
+</html>
