@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Trending Posts: Cancel Culture</title>
+  <script src="https://unpkg.com/compromise"></script>
+</head>
+<body>
+  <h1>Trending Posts: Cancel Culture</h1>
+  <div id="posts"></div>
+
+  <script>
+    async function fetchTrendingPosts() {
+      const searchQuery = 'cancel culture';
+      const limit = 100;
+      const timeRange = '3w'; // Restrict search to last 3 weeks
+
+      const response = await fetch(`https://www.reddit.com/search.json?q=${searchQuery}&sort=top&t=${timeRange}&limit=${limit}`);
+      const data = await response.json();
+
+      // Process the posts
+      const titles = data.data.children.map(post => post.data.title);
+      const combinedText = titles.join(' '); // Combine titles into one long text
+      
+      const doc = nlp(combinedText); // Create a compromise.js document
+      let names = doc.people().out('array'); // Extract names from the document
+
+      // Filter out punctuation and text after it in names (except for names starting with "Dr.")
+      names = names.map(name => {
+        if (!name.startsWith('Dr.')) {
+          return name.replace(/[^a-zA-Z\s].*$/, '');
+        }
+        return name;
+      });
+
+      const uniqueNames = [...new Set(names)]; // Remove duplicates using Set
+      const randomNames = getRandomElements(uniqueNames, 3); // Get 3 random names
+
+      // Store the modified names in variables for later use
+      const name1 = modifyName(randomNames[0]);
+      const name2 = modifyName(randomNames[1]);
+      const name3 = modifyName(randomNames[2]);
+
+      // Display the names with their modified values
+      const postsDiv = document.getElementById('posts');
+      postsDiv.innerHTML = `
+        <p>Name 1: ${randomNames[0]} (Modified: ${name1})</p>
+        <p>Name 2: ${randomNames[1]} (Modified: ${name2})</p>
+        <p>Name 3: ${randomNames[2]} (Modified: ${name3})</p>
+      `;
+    }
+
+// Helper function to modify the name
+function modifyName(name) {
+  const lowercasedName = name.toLowerCase();
+  const modifiedName = lowercasedName.includes(' ') ? lowercasedName.replace(/\s/g, '+') : lowercasedName;
+  return modifiedName;
+}
+
+    // Helper function to get random elements from an array
+    function getRandomElements(array, numElements) {
+      const shuffled = array.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, numElements);
+    }
+
+    fetchTrendingPosts();
+
+     // Get the hashtag input element
+    const hashtagInput = document.getElementById('hashtag-input');
+
+    // Add an event listener to detect changes in the input field
+    hashtagInput.addEventListener('input', function() {
+      // Get the entered hashtag
+      const hashtag = hashtagInput.value;
+
+      // Display the names in the hashtag div
+      const hashtagDiv = document.getElementById('hashtag');
+      hashtagDiv.innerHTML = `
+        <h1>${hashtag}</h1>
+        <p>Name 1</p>
+        <p>Name 2</p>
+        <p>Name 3</p>
+      `;
+    });
+  </script>
+</body>
+</html>
