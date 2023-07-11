@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JSON Text Display with Text-to-Speech and Random Portraits</title>
+    <style>
+
+      img {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+      }
+
+
+      body {
+        margin: 0;
+        font-size: 48px;
+        text-align: center;
+        background-color: #f5f5f5;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let lines = []; 
+      let currentLineIndex = 0; 
+      let synth = window.speechSynthesis; 
+
+     // LOAD JSON
+      fetch('result.json')
+        .then(response => response.json())
+        .then(data => {
+          lines = data.map(item => item.content);
+          displayCurrentLine();
+        })
+        .catch(error => {
+          console.error(error);
+        });
+
+
+      function displayCurrentLine() {
+        synth.cancel();
+
+        const div = document.createElement('div');
+        div.innerHTML = lines[currentLineIndex];
+        document.body.appendChild(div);
+
+        const utterance = new SpeechSynthesisUtterance(lines[currentLineIndex]);
+        utterance.voiceURI = 'Google UK English Female';
+        utterance.lang = 'en-GB';
+        synth.speak(utterance);
+
+        fetch('https://randomuser.me/api/')
+          .then(response => response.json())
+          .then(data => {
+            const img = document.createElement('img');
+            img.src = data.results[0].picture.large;
+            document.body.appendChild(img);
+          })
+          .catch(error => {
+            console.error(error);
+          });
+
+        currentLineIndex = (currentLineIndex + 1) % lines.length;
+      }
+
+      document.addEventListener('mousedown', () => {
+        displayCurrentLine();
+      });
+    </script>
+  </body>
+</html>
